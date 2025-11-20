@@ -1,10 +1,13 @@
+use crate::parser::{
+    decode_base64, determine_fulcio_instance, parse_bundle_from_str, parse_der_certificate,
+};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CertificateChain {
-    pub leaf: Vec<u8>,          // DER-encoded
+    pub leaf: Vec<u8>,               // DER-encoded
     pub intermediates: Vec<Vec<u8>>, // DER-encoded
-    pub root: Vec<u8>,          // DER-encoded
+    pub root: Vec<u8>,               // DER-encoded
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,6 +40,40 @@ impl FulcioInstance {
             "sigstore-intermediate" => Some(FulcioInstance::PublicGood),
             _ => None,
         }
+    }
+
+    /// Detect Fulcio instance from bundle JSON
+    ///
+    /// Parses the bundle and extracts the leaf certificate to determine
+    /// which Fulcio instance signed it (GitHub or PublicGood).
+    ///
+    /// # Arguments
+    ///
+    /// * `bundle_json` - Raw JSON bytes of the sigstore bundle
+    ///
+    /// # Returns
+    ///
+    /// Returns the detected `FulcioInstance` or an error if detection fails
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let bundle_json = std::fs::read_to_string("bundle.sigstore.json")?;
+    /// let instance = FulcioInstance::from_bundle_json(&bundle_json)?;
+    /// let trust_bundle = fetch_trust_bundle(&instance)?;
+    /// ```
+    pub fn from_bundle_json(bundle_json: &str) -> Result<Self, String> {
+        let bundle = parse_bundle_from_str(bundle_json)
+            .map_err(|e| format!("Failed to parse bundle: {}", e))?;
+
+        let leaf_der = decode_base64(&bundle.verification_material.certificate.raw_bytes)
+            .map_err(|e| format!("Failed to decode certificate: {}", e))?;
+
+        let leaf_cert = parse_der_certificate(&leaf_der)
+            .map_err(|e| format!("Failed to parse certificate: {}", e))?;
+
+        determine_fulcio_instance(&leaf_cert)
+            .map_err(|e| format!("Failed to determine Fulcio instance: {}", e))
     }
 }
 

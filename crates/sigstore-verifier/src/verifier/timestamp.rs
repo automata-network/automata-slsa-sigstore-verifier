@@ -2,25 +2,34 @@ use chrono::{DateTime, Utc};
 use x509_parser::prelude::*;
 
 use crate::error::{CertificateError, TimestampError, VerificationError};
-use crate::parser::{decode_base64, parse_integrated_time};
+use crate::parser::parse_integrated_time;
 use crate::types::{SigstoreBundle, TransparencyLogEntry};
 
 pub fn get_signing_time(bundle: &SigstoreBundle) -> Result<DateTime<Utc>, VerificationError> {
-    // Try RFC3161 timestamp first
-    if let Some(ref timestamp_data) = bundle.verification_material.timestamp_verification_data {
-        if let Some(ref rfc3161_timestamps) = timestamp_data.rfc3161_timestamps {
-            if !rfc3161_timestamps.is_empty() {
-                // For now, we'll use integrated time as fallback
-                // TODO: Implement full RFC3161 parsing
-                // let timestamp_der = decode_base64(&rfc3161_timestamps[0].signed_timestamp)?;
-                // return parse_rfc3161_timestamp(&timestamp_der)
-                //     .map(|info| info.signing_time)
-                //     .map_err(|e| e.into());
-            }
-        }
+    // Check if bundle has RFC3161 timestamps
+    let has_rfc3161 = bundle
+        .verification_material
+        .timestamp_verification_data
+        .as_ref()
+        .and_then(|td| td.rfc3161_timestamps.as_ref())
+        .map(|ts| !ts.is_empty())
+        .unwrap_or(false);
+
+    // Check if bundle has transparency log entries
+    let has_tlog = bundle
+        .verification_material
+        .tlog_entries
+        .as_ref()
+        .map(|entries| !entries.is_empty())
+        .unwrap_or(false);
+
+    // RFC3161 timestamp verification is not yet implemented
+    // See RFC-3161.md for implementation requirements
+    if has_rfc3161 && !has_tlog {
+        return Err(TimestampError::Rfc3161NotSupported.into());
     }
 
-    // Fall back to integrated time from transparency log
+    // Use integrated time from transparency log
     if let Some(ref tlog_entries) = bundle.verification_material.tlog_entries {
         if let Some(entry) = tlog_entries.first() {
             return get_integrated_time(entry).map_err(|e| e.into());
@@ -57,7 +66,6 @@ pub fn verify_signing_time_in_validity(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::TimeZone;
 
     #[test]
     fn test_get_integrated_time() {

@@ -87,6 +87,9 @@ pub enum TimestampError {
     #[error("No timestamp found (neither RFC3161 nor integrated time)")]
     NoTimestamp,
 
+    #[error("RFC3161 timestamp verification is not yet supported. This bundle requires RFC3161 support. See RFC-3161.md for implementation details.")]
+    Rfc3161NotSupported,
+
     #[error("Failed to parse RFC3161 timestamp: {0}")]
     Rfc3161Parse(String),
 
@@ -107,9 +110,6 @@ pub enum TransparencyError {
 
     #[error("Merkle tree inclusion proof verification failed")]
     InclusionProofFailed,
-
-    #[error("Failed to fetch Rekor log entry: {0}")]
-    RekorFetchFailed(String),
 
     #[error("Signed entry timestamp verification failed")]
     SignedEntryTimestampInvalid,

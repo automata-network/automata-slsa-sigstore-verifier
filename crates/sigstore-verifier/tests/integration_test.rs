@@ -1,4 +1,8 @@
-use sigstore_verifier::{types::VerificationOptions, AttestationVerifier};
+use sigstore_verifier::{
+    fetcher::fetch_trust_bundle,
+    types::{FulcioInstance, VerificationOptions},
+    AttestationVerifier,
+};
 use std::path::PathBuf;
 
 #[test]
@@ -9,6 +13,15 @@ fn test_verify_real_bundle() {
     path.pop();
     path.push("samples/actions-attest-build-provenance-attestation-13532655.sigstore.json");
 
+    // Auto-detect Fulcio instance from bundle
+    let bundle_json = std::fs::read_to_string(&path).expect("Failed to read bundle");
+    let instance = FulcioInstance::from_bundle_json(&bundle_json)
+        .expect("Failed to detect Fulcio instance");
+
+    // Fetch trust bundle for detected instance
+    // In production, the client should fetch and cache this
+    let trust_bundle = fetch_trust_bundle(&instance).expect("Failed to fetch trust bundle");
+
     let verifier = AttestationVerifier::new();
     let options = VerificationOptions {
         expected_digest: None,
@@ -18,9 +31,9 @@ fn test_verify_real_bundle() {
         expected_subject: None,
     };
 
-    let result = verifier.verify_bundle(&path, options);
+    let result = verifier.verify_bundle(&path, &trust_bundle, options);
     assert!(result.is_ok(), "Verification failed: {:?}", result.err());
-    
+
     if let Ok(verification_result) = result {
         println!("Verification succeeded!");
         println!(

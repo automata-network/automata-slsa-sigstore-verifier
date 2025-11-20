@@ -1,4 +1,8 @@
-use sigstore_verifier::{AttestationVerifier, types::VerificationOptions};
+use sigstore_verifier::{
+    fetcher::fetch_trust_bundle,
+    types::{FulcioInstance, VerificationOptions},
+    AttestationVerifier,
+};
 use std::env;
 use std::path::PathBuf;
 
@@ -17,6 +21,10 @@ fn main() {
         std::process::exit(1);
     }
 
+    let bundle_json = std::fs::read_to_string(&bundle_path).expect("Failed to read bundle file");
+    let fulcio_instance = FulcioInstance::from_bundle_json(&bundle_json)
+        .expect("Failed to detect Fulcio instance from bundle");
+
     println!("Verifying bundle: {}", bundle_path.display());
     println!();
 
@@ -30,7 +38,10 @@ fn main() {
         expected_subject: None,
     };
 
-    match verifier.verify_bundle(&bundle_path, options) {
+    let fulcio_issuer_chain =
+        fetch_trust_bundle(&fulcio_instance).expect("Failed to fetch Fulcio trust bundle");
+
+    match verifier.verify_bundle(&bundle_path, &fulcio_issuer_chain, options) {
         Ok(result) => {
             println!("✓ Verification SUCCESS\n");
 

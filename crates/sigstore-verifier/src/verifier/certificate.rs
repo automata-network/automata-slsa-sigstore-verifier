@@ -2,22 +2,33 @@ use x509_parser::prelude::*;
 
 use crate::crypto::{sha256, PublicKey};
 use crate::error::CertificateError;
-use crate::fetcher::fetch_trust_bundle;
-use crate::parser::{decode_base64, determine_fulcio_instance, parse_der_certificate};
+use crate::parser::{decode_base64, parse_der_certificate};
 use crate::types::{CertificateChain, CertificateChainHashes, SigstoreBundle};
 
+/// Verify the certificate chain using provided trust bundle
+///
+/// # Arguments
+///
+/// * `bundle` - The Sigstore bundle containing the leaf certificate
+/// * `trust_bundle` - The trust bundle (intermediates and root) for verification
+///
+/// # Returns
+///
+/// Returns the complete certificate chain and SHA256 hashes of all certificates
 pub fn verify_certificate_chain(
     bundle: &SigstoreBundle,
+    trust_bundle: &CertificateChain,
 ) -> Result<(CertificateChain, CertificateChainHashes), CertificateError> {
     // Parse leaf certificate from bundle
     let leaf_der = decode_base64(&bundle.verification_material.certificate.raw_bytes)
         .map_err(|e| CertificateError::ParseError(e.to_string()))?;
-    let leaf_cert = parse_der_certificate(&leaf_der)?;
 
-    // Determine Fulcio instance and fetch trust bundle
-    let fulcio_instance = determine_fulcio_instance(&leaf_cert)?;
-    let mut chain = fetch_trust_bundle(&fulcio_instance)?;
-    chain.leaf = leaf_der.clone();
+    // Create complete chain with leaf from bundle
+    let chain = CertificateChain {
+        leaf: leaf_der.clone(),
+        intermediates: trust_bundle.intermediates.clone(),
+        root: trust_bundle.root.clone(),
+    };
 
     // Parse all certificates
     let leaf_x509 = parse_der_certificate(&chain.leaf)?;
@@ -77,15 +88,4 @@ fn verify_cert_signature(
         .map_err(|e| CertificateError::ChainVerificationFailed(e.to_string()))?;
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_verify_cert_signature_placeholder() {
-        // This would require test certificates
-        // Placeholder to ensure compilation
-    }
 }

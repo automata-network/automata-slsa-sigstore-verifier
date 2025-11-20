@@ -1,6 +1,5 @@
-use base64::prelude::*;
 use crate::crypto::PublicKey;
-use crate::error::{SignatureError, VerificationError};
+use crate::error::VerificationError;
 use crate::parser::{decode_base64, parse_der_certificate};
 use crate::types::{CertificateChain, DsseEnvelope};
 
@@ -66,6 +65,7 @@ fn create_pae(payload_type: &str, payload_b64: &str) -> Result<Vec<u8>, Verifica
 #[cfg(test)]
 mod tests {
     use super::*;
+    use base64::prelude::*;
 
     #[test]
     fn test_create_pae() {
