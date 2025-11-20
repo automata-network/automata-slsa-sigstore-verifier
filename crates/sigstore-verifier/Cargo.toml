@@ -1,0 +1,22 @@
+[package]
+name = "sigstore-verifier"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+base64 = "0.22"
+hex = "0.4"
+sha2 = "0.10"
+x509-parser = "0.16"
+# ECDSA support
+p256 = { version = "0.13", features = ["ecdsa", "pem"] }
+p384 = { version = "0.13", features = ["ecdsa", "pem"] }
+ecdsa = "0.16"
+# HTTP client
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+chrono = "0.4"
+thiserror = "2.0"
+asn1-rs = "0.6"
+pem = "3.0"
