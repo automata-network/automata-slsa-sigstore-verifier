@@ -23,6 +23,7 @@ pub enum VerificationError {
     #[error("Subject digest mismatch: expected {expected}, got {actual}")]
     SubjectDigestMismatch { expected: String, actual: String },
 
+    #[cfg(feature = "fetcher")]
     #[error("HTTP request failed: {0}")]
     HttpError(#[from] reqwest::Error),
 

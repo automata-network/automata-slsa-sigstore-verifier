@@ -1,3 +1,5 @@
+#![cfg(feature = "fetcher")]
+
 use sigstore_verifier::{
     fetcher::fetch_trust_bundle,
     types::{FulcioInstance, VerificationOptions},

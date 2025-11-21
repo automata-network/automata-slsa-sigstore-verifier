@@ -1,5 +1,6 @@
 pub mod crypto;
 pub mod error;
+#[cfg(feature = "fetcher")]
 pub mod fetcher;
 pub mod parser;
 pub mod types;
