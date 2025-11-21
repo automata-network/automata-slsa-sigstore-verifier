@@ -45,16 +45,81 @@ pub struct Rfc3161Timestamp {
     pub signed_data: Vec<u8>,                // Raw SignedData for signature verification
 }
 
+/// Extract TimeStampToken (ContentInfo) from TimeStampResp
+///
+/// TimeStampResp ::= SEQUENCE {
+///     status         PKIStatusInfo,
+///     timeStampToken TimeStampToken OPTIONAL
+/// }
+///
+/// This function manually parses the DER-encoded TimeStampResp to extract
+/// the TimeStampToken (ContentInfo), skipping the PKIStatusInfo.
+fn extract_timestamp_token_from_resp(der: &[u8]) -> Result<ContentInfo, TimestampError> {
+    use asn1_rs::{Any, FromDer};
+
+    // Parse outer SEQUENCE (TimeStampResp)
+    let (rem, resp_seq) = asn1_rs::Sequence::from_der(der)
+        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse TimeStampResp: {}", e)))?;
+
+    // The sequence should contain the entire response
+    if !rem.is_empty() {
+        return Err(TimestampError::Rfc3161Parse(
+            "Extra bytes after TimeStampResp".to_string(),
+        ));
+    }
+
+    // Parse the sequence content to find PKIStatusInfo and TimeStampToken
+    let resp_bytes = resp_seq.content.as_ref();
+
+    // Parse first element (PKIStatusInfo - a SEQUENCE)
+    let (rem_after_status, _pki_status) = Any::from_der(resp_bytes)
+        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse PKIStatusInfo: {}", e)))?;
+
+    // The remainder should be the TimeStampToken (ContentInfo)
+    if rem_after_status.is_empty() {
+        return Err(TimestampError::Rfc3161Parse(
+            "No TimeStampToken found in TimeStampResp".to_string(),
+        ));
+    }
+
+    // The remainder is the complete TimeStampToken (a ContentInfo structure)
+    use der::Decode;
+    ContentInfo::from_der(rem_after_status)
+        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse ContentInfo from TimeStampResp: {}", e)))
+}
+
 /// Parse an RFC 3161 timestamp token from DER-encoded bytes
 ///
 /// This parses the CMS ContentInfo structure and extracts:
 /// - TSTInfo (timestamp information including signing time and message imprint)
 /// - Embedded certificates (if present)
 /// - SignedData for later signature verification
+///
+/// The input may be either:
+/// - A TimeStampResp (SEQUENCE containing PKIStatusInfo and TimeStampToken)
+/// - A bare TimeStampToken (ContentInfo)
+///
+/// This function handles both formats automatically.
 pub fn parse_rfc3161_timestamp(der: &[u8]) -> Result<Rfc3161Timestamp, TimestampError> {
-    // Parse the ContentInfo structure
-    let content_info = ContentInfo::from_der(der)
-        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse ContentInfo: {}", e)))?;
+    // Try to parse as ContentInfo first (bare TimeStampToken)
+    let content_info = match ContentInfo::from_der(der) {
+        Ok(ci) => ci,
+        Err(first_error) => {
+            // If that fails, try parsing as TimeStampResp
+            // TimeStampResp structure: SEQUENCE { status, timeStampToken }
+            // We need to skip the PKIStatusInfo and extract the TimeStampToken
+            match extract_timestamp_token_from_resp(der) {
+                Ok(ci) => ci,
+                Err(_) => {
+                    // Both attempts failed - return the original error
+                    return Err(TimestampError::Rfc3161Parse(format!(
+                        "Failed to parse RFC 3161 timestamp: {}",
+                        first_error
+                    )));
+                }
+            }
+        }
+    };
 
     // Extract SignedData from content
     let signed_data_bytes = content_info
@@ -137,7 +202,8 @@ fn parse_tstinfo_asn1(der: &[u8]) -> Result<TSTInfo, TimestampError> {
     let (_, gen_time_obj) = Any::from_der(rem)
         .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse genTime: {}", e)))?;
 
-    let gen_time = parse_generalized_time(gen_time_obj.as_bytes())
+    // Use data() to get the actual content bytes without tag/length
+    let gen_time = parse_generalized_time_value(gen_time_obj.data)
         .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse GeneralizedTime: {}", e)))?;
 
     Ok(TSTInfo {
@@ -192,14 +258,11 @@ fn parse_hash_algorithm_from_sequence(seq: &asn1_rs::Sequence) -> Result<HashAlg
 /// Parse GeneralizedTime to DateTime<Utc>
 ///
 /// Format: YYYYMMDDHHMMSSsZ or YYYYMMDDHHMMSS.fffZ
-fn parse_generalized_time(der: &[u8]) -> Result<DateTime<Utc>, String> {
-    use asn1_rs::{FromDer, GeneralizedTime};
-
-    let (_, gen_time) = GeneralizedTime::from_der(der)
-        .map_err(|e| format!("Failed to parse GeneralizedTime: {}", e))?;
-
-    // Convert ASN.1 GeneralizedTime to chrono DateTime
-    let time_str = gen_time.to_string();
+/// Parse GeneralizedTime from value bytes (without tag/length)
+fn parse_generalized_time_value(value_bytes: &[u8]) -> Result<DateTime<Utc>, String> {
+    // GeneralizedTime format: YYYYMMDDHHMMSS[.fff]Z (as ASCII/UTF8 string)
+    let time_str = std::str::from_utf8(value_bytes)
+        .map_err(|e| format!("Invalid UTF-8 in GeneralizedTime: {}", e))?;
 
     // Parse format: YYYYMMDDHHMMSSZ or YYYYMMDDHHMMSS.fffZ
     let time_str_clean = time_str.trim_end_matches('Z');

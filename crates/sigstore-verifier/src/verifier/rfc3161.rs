@@ -61,7 +61,8 @@ pub fn verify_rfc3161_timestamp(
     verify_message_imprint(&signature_bytes, &parsed_timestamp.tst_info.message_imprint)?;
 
     // Verify PKCS#7 signature on the timestamp token
-    verify_pkcs7_signature(&timestamp_der, tsa_chain)?;
+    // Use the signed_data we already extracted during parsing
+    verify_pkcs7_signature(&parsed_timestamp.signed_data, tsa_chain)?;
 
     Ok(parsed_timestamp.tst_info.gen_time)
 }
@@ -95,27 +96,17 @@ fn verify_message_imprint(
 ///
 /// # Arguments
 ///
-/// * `timestamp_der` - DER-encoded timestamp token (SignedData)
+/// * `signed_data_bytes` - DER-encoded SignedData (already extracted from ContentInfo)
 /// * `tsa_chain` - TSA certificate chain for verification
 fn verify_pkcs7_signature(
-    timestamp_der: &[u8],
+    signed_data_bytes: &[u8],
     tsa_chain: &CertificateChain,
 ) -> Result<(), TimestampError> {
-    use cms::content_info::ContentInfo;
     use cms::signed_data::SignedData;
     use der::{Decode, Encode};
 
-    // Parse ContentInfo
-    let content_info = ContentInfo::from_der(timestamp_der)
-        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse ContentInfo: {}", e)))?;
-
-    // Extract SignedData
-    let signed_data_bytes = content_info
-        .content
-        .to_der()
-        .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to encode SignedData: {}", e)))?;
-
-    let signed_data = SignedData::from_der(&signed_data_bytes)
+    // Parse SignedData
+    let signed_data = SignedData::from_der(signed_data_bytes)
         .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse SignedData: {}", e)))?;
 
     // Verify we have signer infos

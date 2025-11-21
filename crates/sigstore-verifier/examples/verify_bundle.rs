@@ -1,4 +1,6 @@
-use sigstore_verifier::fetcher::trust_bundle::fetch_trust_bundle;
+use sigstore_verifier::fetcher::trust_bundle::{
+    fetch_fulcio_trust_bundle, fetch_trust_bundle_from_url,
+};
 use sigstore_verifier::types::certificate::FulcioInstance;
 use sigstore_verifier::types::result::VerificationOptions;
 use sigstore_verifier::AttestationVerifier;
@@ -37,9 +39,24 @@ fn main() {
     };
 
     let fulcio_issuer_chain =
-        fetch_trust_bundle(&fulcio_instance).expect("Failed to fetch Fulcio trust bundle");
+        fetch_fulcio_trust_bundle(&fulcio_instance).expect("Failed to fetch Fulcio trust bundle");
 
-    match verifier.verify_bundle(&bundle_path, options, &fulcio_issuer_chain, None) {
+    let tsa_trust_bundle = match fulcio_instance {
+        FulcioInstance::GitHub => Some(
+            fetch_trust_bundle_from_url(
+                "https://timestamp.githubapp.com/api/v1/timestamp/certchain",
+            )
+            .expect("Failed to fetch TSA trust bundle"),
+        ),
+        _ => None,
+    };
+
+    match verifier.verify_bundle(
+        &bundle_path,
+        options,
+        &fulcio_issuer_chain,
+        tsa_trust_bundle.as_ref(),
+    ) {
         Ok(result) => {
             println!("✓ Verification SUCCESS\n");
 

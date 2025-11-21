@@ -1,7 +1,7 @@
 use x509_parser::prelude::*;
 
 use crate::error::CertificateError;
-use crate::types::certificate::FulcioInstance;
+use crate::types::certificate::{CertificateChain, FulcioInstance};
 
 pub fn parse_der_certificate(der: &[u8]) -> Result<X509Certificate, CertificateError> {
     let (_, cert) = X509Certificate::from_der(der)
@@ -59,6 +59,64 @@ pub fn determine_fulcio_instance(cert: &X509Certificate) -> Result<FulcioInstanc
 
 pub fn extract_subject_public_key_info<'a>(cert: &'a X509Certificate) -> &'a SubjectPublicKeyInfo<'a> {
     cert.public_key()
+}
+
+/// Convert a vector of DER-encoded certificates to CertificateChain structure
+///
+/// Organizes certificates into the expected chain structure with leaf,
+/// intermediates, and root. Handles chains of any length >= 1.
+///
+/// # Arguments
+/// * `certs` - Vector of DER-encoded certificates (ordered: leaf, intermediates..., root)
+///
+/// # Returns
+/// * `CertificateChain` with proper structure
+///
+/// # Chain Structure
+/// - 1 cert: Self-signed leaf (empty intermediates and root)
+/// - 2 certs: Leaf + root (empty intermediates)
+/// - 3+ certs: Leaf + intermediates + root
+pub fn certs_to_chain(certs: Vec<Vec<u8>>) -> Result<CertificateChain, CertificateError> {
+    if certs.is_empty() {
+        return Err(CertificateError::ParseError(
+            "Certificate chain is empty".into(),
+        ));
+    }
+
+    let mut certs = certs;
+
+    match certs.len() {
+        1 => {
+            // Self-signed leaf
+            let leaf = certs.pop().unwrap();
+            Ok(CertificateChain {
+                leaf,
+                intermediates: vec![],
+                root: vec![],
+            })
+        }
+        2 => {
+            // Leaf + root, no intermediates
+            let root = certs.pop().unwrap();
+            let leaf = certs.pop().unwrap();
+            Ok(CertificateChain {
+                leaf,
+                intermediates: vec![],
+                root,
+            })
+        }
+        _ => {
+            // Leaf + intermediates + root
+            let root = certs.pop().unwrap();
+            let leaf = certs.remove(0);
+            let intermediates = certs; // Remaining middle certs
+            Ok(CertificateChain {
+                leaf,
+                intermediates,
+                root,
+            })
+        }
+    }
 }
 
 #[cfg(test)]
