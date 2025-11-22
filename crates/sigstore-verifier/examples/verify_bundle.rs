@@ -1,3 +1,9 @@
+// This example demonstrates verifying a Sigstore bundle by fetching
+// certificate trust bundles from remote URLs.
+//
+// For an alternative approach using local trust root bundles (JSONL format),
+// see the verify_bundle_with_trusted_root example.
+
 use sigstore_verifier::fetcher::trust_bundle::{
     fetch_fulcio_trust_bundle, fetch_trust_bundle_from_url,
 };

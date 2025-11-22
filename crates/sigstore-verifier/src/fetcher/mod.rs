@@ -7,4 +7,6 @@
 //! **Note**: The verification library itself does not fetch data. Clients are
 //! responsible for fetching and providing certificate chains to the verifier.
 
+pub mod jsonl;
+#[cfg(feature = "fetcher")]
 pub mod trust_bundle;

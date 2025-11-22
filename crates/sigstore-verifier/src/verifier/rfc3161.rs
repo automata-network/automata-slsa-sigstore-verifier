@@ -103,7 +103,7 @@ fn verify_pkcs7_signature(
     tsa_chain: &CertificateChain,
 ) -> Result<(), TimestampError> {
     use cms::signed_data::SignedData;
-    use der::{Decode, Encode};
+    use der::Decode;
 
     // Parse SignedData
     let signed_data = SignedData::from_der(signed_data_bytes)
@@ -118,13 +118,35 @@ fn verify_pkcs7_signature(
     let signer_info = signed_data.signer_infos.0.iter().next()
         .ok_or_else(|| TimestampError::Rfc3161SignatureInvalid)?;
 
-    // Get the encapsulated content (TSTInfo) that was signed
-    let signed_content = signed_data
-        .encap_content_info
-        .econtent
-        .as_ref()
-        .ok_or_else(|| TimestampError::Rfc3161Parse("No encapsulated content".to_string()))?
-        .value();
+    // Determine what content was actually signed
+    // If signed attributes are present, the signature is over the DER encoding of the attributes
+    // Otherwise, it's over the encapsulated content
+    let signed_content_bytes = if let Some(ref signed_attrs) = signer_info.signed_attrs {
+        // When signed attributes are present, the signature is over the DER encoding
+        // of the SET OF Attribute structure
+        // The signed_attrs field has tag [0] IMPLICIT, but for signing we need SET (tag 0x31)
+        use der::Encode;
+        let mut attrs_der = signed_attrs.to_der()
+            .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to encode signed attributes: {}", e)))?;
+
+        // Replace the [0] IMPLICIT tag (0xA0) with SET tag (0x31)
+        // Per RFC 5652, the signature is computed over the DER encoding of the
+        // signedAttrs field with the tag changed from [0] IMPLICIT to SET
+        if !attrs_der.is_empty() && attrs_der[0] == 0xA0 {
+            attrs_der[0] = 0x31; // SET tag
+        }
+
+        attrs_der
+    } else {
+        // No signed attributes - signature is directly over the encapsulated content
+        signed_data
+            .encap_content_info
+            .econtent
+            .as_ref()
+            .ok_or_else(|| TimestampError::Rfc3161Parse("No encapsulated content".to_string()))?
+            .value()
+            .to_vec()
+    };
 
     // Parse the TSA leaf certificate from the chain
     let tsa_leaf_cert = parse_der_certificate(&tsa_chain.leaf)
@@ -136,7 +158,7 @@ fn verify_pkcs7_signature(
 
     // Verify the signature using the digest algorithm and signature algorithm from signer info
     verify_cms_signature(
-        signed_content,
+        &signed_content_bytes,
         &signer_info.signature.as_bytes(),
         public_key_der,
         &signer_info.digest_alg,
@@ -202,7 +224,7 @@ fn verify_rsa_signature(
     public_key_der: &[u8],
 ) -> Result<(), TimestampError> {
     use rsa::pkcs1v15::VerifyingKey;
-    use rsa::signature::Verifier;
+    use rsa::signature::hazmat::PrehashVerifier;
     use rsa::RsaPublicKey;
     use rsa::pkcs8::DecodePublicKey;
     use sha2::{Sha256, Sha384};
@@ -219,7 +241,7 @@ fn verify_rsa_signature(
             let sig = rsa::pkcs1v15::Signature::try_from(signature)
                 .map_err(|e| TimestampError::Rfc3161Parse(format!("Invalid RSA signature: {}", e)))?;
             verifying_key
-                .verify(digest, &sig)
+                .verify_prehash(digest, &sig)
                 .map_err(|_| TimestampError::Rfc3161SignatureInvalid)?;
         }
         48 => {
@@ -228,7 +250,7 @@ fn verify_rsa_signature(
             let sig = rsa::pkcs1v15::Signature::try_from(signature)
                 .map_err(|e| TimestampError::Rfc3161Parse(format!("Invalid RSA signature: {}", e)))?;
             verifying_key
-                .verify(digest, &sig)
+                .verify_prehash(digest, &sig)
                 .map_err(|_| TimestampError::Rfc3161SignatureInvalid)?;
         }
         _ => {
@@ -248,7 +270,7 @@ fn verify_ecdsa_signature(
     signature: &[u8],
     public_key_der: &[u8],
 ) -> Result<(), TimestampError> {
-    use ecdsa::signature::Verifier;
+    use ecdsa::signature::hazmat::PrehashVerifier;
     use p256::ecdsa::{Signature as P256Signature, VerifyingKey as P256VerifyingKey};
     use p256::pkcs8::DecodePublicKey as P256DecodePublicKey;
     use p384::ecdsa::{Signature as P384Signature, VerifyingKey as P384VerifyingKey};
@@ -264,7 +286,7 @@ fn verify_ecdsa_signature(
                 .map_err(|e| TimestampError::Rfc3161Parse(format!("Invalid ECDSA signature: {}", e)))?;
 
             verifying_key
-                .verify(digest, &sig)
+                .verify_prehash(digest, &sig)
                 .map_err(|_| TimestampError::Rfc3161SignatureInvalid)?;
         }
         48 => {
@@ -276,7 +298,7 @@ fn verify_ecdsa_signature(
                 .map_err(|e| TimestampError::Rfc3161Parse(format!("Invalid ECDSA signature: {}", e)))?;
 
             verifying_key
-                .verify(digest, &sig)
+                .verify_prehash(digest, &sig)
                 .map_err(|_| TimestampError::Rfc3161SignatureInvalid)?;
         }
         _ => {
