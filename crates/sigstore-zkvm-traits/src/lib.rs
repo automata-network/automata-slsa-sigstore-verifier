@@ -24,7 +24,7 @@
 //! Future zkVM implementations (RISC0, SP1) will implement the `ZkVmProver` trait:
 //!
 //! ```ignore
-//! use sigstore_zkvm::{ZkVmProver, ProverInput};
+//! use sigstore_zkvm::types::{ZkVmProver, ProverInput};
 //!
 //! // Create prover instance
 //! let prover = Risc0Prover::new()?;
@@ -41,17 +41,6 @@
 //! let (public_output, proof_bytes) = prover.prove(&config, &input).await?;
 //! ```
 
-mod error;
-mod traits;
-mod types;
-
-// Re-export public API
-pub use error::ZkVmError;
-pub use traits::ZkVmProver;
-pub use types::{ProverInput, ProverOutput};
-
-// Re-export commonly used types from sigstore-verifier for convenience
-pub use sigstore_verifier::types::{
-    certificate::OidcIdentity,
-    result::{CertificateChainHashes, VerificationOptions},
-};
+pub mod error;
+pub mod traits;
+pub mod types;
