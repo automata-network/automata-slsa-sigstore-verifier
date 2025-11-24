@@ -182,7 +182,7 @@ pub fn verify_tsa_certificate_eku(cert: &X509Certificate) -> Result<(), Certific
     }
 
     // Parse Extended Key Usage extension
-    let eku = match eku_ext.parsed_extension() {
+    let _eku = match eku_ext.parsed_extension() {
         x509_parser::extensions::ParsedExtension::ExtendedKeyUsage(eku) => eku,
         _ => {
             return Err(CertificateError::ChainVerificationFailed(
@@ -234,8 +234,6 @@ pub fn verify_tsa_certificate_eku(cert: &X509Certificate) -> Result<(), Certific
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn test_time_stamping_oid() {
         // Verify the OID constant is correct

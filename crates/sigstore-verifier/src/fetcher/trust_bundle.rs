@@ -32,9 +32,11 @@ pub fn fetch_fulcio_trust_bundle(
 ///
 /// # Example
 /// ```ignore
+/// use sigstore_verifier::fetcher::trust_bundle::fetch_trust_bundle_from_url;
+///
 /// // Fetch TSA trust bundle (GitHub format - raw PEM)
 /// let tsa_url = "https://timestamp.githubapp.com/api/v1/timestamp/certchain";
-/// let tsa_chain = fetch_trust_bundle_from_url(tsa_url)?;
+/// let tsa_chain = fetch_trust_bundle_from_url(tsa_url).unwrap();
 /// ```
 pub fn fetch_trust_bundle_from_url(url: &str) -> Result<CertificateChain, CertificateError> {
     let response = reqwest::blocking::get(url)

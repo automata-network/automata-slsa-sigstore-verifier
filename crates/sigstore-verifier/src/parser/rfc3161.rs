@@ -173,7 +173,7 @@ fn parse_tstinfo(signed_data: &SignedData) -> Result<TSTInfo, TimestampError> {
 fn parse_tstinfo_asn1(der: &[u8]) -> Result<TSTInfo, TimestampError> {
     use asn1_rs::{FromDer, Integer, Sequence, Any};
 
-    let (rem, tstinfo_seq) = Sequence::from_der(der)
+    let (_rem, tstinfo_seq) = Sequence::from_der(der)
         .map_err(|e| TimestampError::Rfc3161Parse(format!("Failed to parse TSTInfo sequence: {}", e)))?;
 
     // Parse the sequence contents manually

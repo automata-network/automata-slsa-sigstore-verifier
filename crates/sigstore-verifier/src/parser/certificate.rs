@@ -3,7 +3,7 @@ use x509_parser::prelude::*;
 use crate::error::CertificateError;
 use crate::types::certificate::{CertificateChain, FulcioInstance};
 
-pub fn parse_der_certificate(der: &[u8]) -> Result<X509Certificate, CertificateError> {
+pub fn parse_der_certificate(der: &[u8]) -> Result<X509Certificate<'_>, CertificateError> {
     let (_, cert) = X509Certificate::from_der(der)
         .map_err(|e| CertificateError::ParseError(e.to_string()))?;
     Ok(cert)

@@ -58,13 +58,14 @@ impl FulcioInstance {
     ///
     /// ```ignore
     /// # #[cfg(feature = "fetcher")]
-    /// # {
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// use sigstore_verifier::types::certificate::FulcioInstance;
     /// use sigstore_verifier::fetcher::trust_bundle::fetch_fulcio_trust_bundle;
     ///
     /// let bundle_json = std::fs::read_to_string("bundle.sigstore.json")?;
     /// let instance = FulcioInstance::from_bundle_json(&bundle_json)?;
     /// let trust_bundle = fetch_fulcio_trust_bundle(&instance)?;
+    /// # Ok(())
     /// # }
     /// ```
     pub fn from_bundle_json(bundle_json: &str) -> Result<Self, String> {

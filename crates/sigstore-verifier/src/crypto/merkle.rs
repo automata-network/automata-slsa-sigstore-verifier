@@ -70,7 +70,6 @@ mod tests {
     fn test_verify_inclusion_proof_simple() {
         // Test with a simple tree
         let leaf = vec![1u8; 32];
-        let root = vec![2u8; 32];
         let proof = vec![];
 
         // Single leaf tree
