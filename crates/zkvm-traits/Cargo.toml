@@ -1,0 +1,13 @@
+[package]
+name = "sigstore-zkvm-traits"
+version = { workspace = true }
+edition = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = { workspace = true}
+async-trait = { workspace = true }
+sigstore-verifier = { workspace = true }
+serde = { workspace = true, features = ["derive"] }

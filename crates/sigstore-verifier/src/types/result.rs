@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use super::certificate::OidcIdentity;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationResult {
     pub certificate_hashes: CertificateChainHashes,
     pub signing_time: DateTime<Utc>,
@@ -10,7 +10,7 @@ pub struct VerificationResult {
     pub oidc_identity: Option<OidcIdentity>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CertificateChainHashes {
     pub leaf: [u8; 32],
     pub intermediates: Vec<[u8; 32]>,
