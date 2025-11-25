@@ -6,7 +6,7 @@ authors.workspace = true
 homepage.workspace = true
 
 [dependencies]
-risc0-zkvm = { version = "^3.0.3", features = ["unstable"] }
+risc0-zkvm = { version = "^3.0.3", features = ["client"] }
 risc0-ethereum-contracts = { workspace = true }
 sigstore-risc0-methods = { path = "../risc0" }
 sigstore-verifier = { path = "../sigstore-verifier" }
