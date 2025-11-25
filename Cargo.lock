@@ -7807,6 +7807,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "sp1-host"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.22.1",
+ "bincode",
+ "clap",
+ "dotenvy",
+ "hex",
+ "serde",
+ "serde_json",
+ "sigstore-verifier",
+ "sigstore-zkvm-traits",
+ "sp1-sdk",
+ "sugstore-sp1-methods",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "sp1-lib"
 version = "5.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
