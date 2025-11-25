@@ -9,6 +9,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Automata Team"]
 homepage = "https://ata.network/"
+license = "MIT"
 
 [workspace.dependencies]
 
