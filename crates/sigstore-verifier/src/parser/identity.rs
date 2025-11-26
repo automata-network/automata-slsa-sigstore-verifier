@@ -1,4 +1,3 @@
-use ::asn1_rs::{FromDer, OctetString};
 use x509_parser::prelude::*;
 use x509_parser::oid_registry::Oid;
 
@@ -74,38 +73,32 @@ fn oid_equals(oid: &Oid, expected: &[u64]) -> bool {
 }
 
 fn extract_string_from_extension(ext: &X509Extension) -> Result<Option<String>, CertificateError> {
-    // The extension value is DER-encoded
-    // For string values, it's typically an OCTET STRING containing UTF8String or IA5String
-    match OctetString::from_der(ext.value) {
-        Ok((_, octet_string)) => {
-            let inner_bytes = octet_string.as_ref();
+    // x509_parser already unwraps the OCTET STRING for us, so ext.value contains
+    // the inner bytes directly (e.g., UTF8String, IA5String, etc.)
+    let bytes = ext.value;
 
-            // Try to parse as UTF8
-            if let Ok(s) = std::str::from_utf8(inner_bytes) {
+    if bytes.is_empty() {
+        return Ok(None);
+    }
+
+    // First, try to parse as DER-encoded ASN.1 string type
+    // Check if it starts with a known string tag
+    if bytes.len() > 2 {
+        let tag = bytes[0];
+        let len = bytes[1] as usize;
+
+        // UTF8String (0x0C) or IA5String (0x16) or PrintableString (0x13)
+        if (tag == 0x0C || tag == 0x16 || tag == 0x13) && len + 2 <= bytes.len() {
+            if let Ok(s) = std::str::from_utf8(&bytes[2..2 + len]) {
                 return Ok(Some(s.to_string()));
             }
-
-            // The inner content might be another DER-encoded string
-            // Try parsing as an ASN.1 string type
-            if inner_bytes.is_empty() {
-                return Ok(None);
-            }
-
-            // Simple heuristic: if it starts with a string tag, extract it
-            if inner_bytes.len() > 2 {
-                let tag = inner_bytes[0];
-                let len = inner_bytes[1] as usize;
-
-                // UTF8String (0x0C) or IA5String (0x16) or PrintableString (0x13)
-                if (tag == 0x0C || tag == 0x16 || tag == 0x13) && len + 2 <= inner_bytes.len() {
-                    if let Ok(s) = std::str::from_utf8(&inner_bytes[2..2 + len]) {
-                        return Ok(Some(s.to_string()));
-                    }
-                }
-            }
-
-            Ok(None)
         }
-        Err(_) => Ok(None),
     }
+
+    // Fallback: try to parse as direct UTF-8 (in case it's not DER-encoded)
+    if let Ok(s) = std::str::from_utf8(bytes) {
+        return Ok(Some(s.to_string()));
+    }
+
+    Ok(None)
 }

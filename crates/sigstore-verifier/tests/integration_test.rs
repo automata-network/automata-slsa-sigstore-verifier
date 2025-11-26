@@ -1,12 +1,10 @@
-#![cfg(feature = "fetcher")]
-
 use sigstore_verifier::types::certificate::FulcioInstance;
 use sigstore_verifier::types::result::VerificationOptions;
 use sigstore_verifier::AttestationVerifier;
 use std::path::PathBuf;
 
 #[test]
-#[ignore] // Requires network access to fetch trust bundles
+#[cfg(feature = "fetcher")]
 fn test_verify_rekor_bundle() {
     use sigstore_verifier::fetcher::trust_bundle::fetch_fulcio_trust_bundle;
 
@@ -50,7 +48,6 @@ fn test_verify_rekor_bundle() {
 }
 
 #[test]
-#[ignore] // Requires network access to fetch trust bundles
 fn test_verify_rfc3161_bundle() {
     use sigstore_verifier::fetcher::jsonl::parser::{
         load_trusted_root_from_jsonl, select_certificate_authority, select_timestamp_authority,
