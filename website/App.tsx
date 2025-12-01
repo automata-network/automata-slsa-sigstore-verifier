@@ -32,7 +32,7 @@ const App: React.FC = () => {
               <div className="flex items-baseline space-x-4">
                 <a href="#overview" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Overview</a>
                 <a href="#bundles" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Get Started</a>
-                <a href="#verifier" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Our Verifier</a>
+                <a href="#verifier" className="hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">ZK Verification</a>
                 {/* <a href="#faq" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Ask AI</a> */}
               </div>
             </div>
@@ -73,17 +73,16 @@ const App: React.FC = () => {
                         View Verifier
                     </a>
                 </div>
-                
-                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
-                    <ChevronDown />
-                </div>
+            </div>
+
+            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
+                <ChevronDown />
             </div>
         </section>
 
         {/* Protocol Overview */}
         <section id="protocol" className="py-12 bg-slate-950 scroll-mt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-bold text-white mb-4">Protocol Overview</h2>
                 <OverviewDiagram />
             </div>
         </section>

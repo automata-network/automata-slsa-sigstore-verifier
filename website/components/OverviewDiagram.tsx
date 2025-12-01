@@ -91,7 +91,7 @@ const SigstoreExplainer = () => {
         <header className="space-y-6 text-center">
           <div className="inline-flex items-center space-x-3 bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
             <ShieldCheck className="w-6 h-6 text-green-400" />
-            <span className="font-semibold text-green-400 tracking-wide uppercase text-sm">Sigstore Protocol Explorer</span>
+            <span className="font-semibold text-green-400 tracking-wide uppercase text-sm">Sigstore Protocol Overview</span>
           </div>
           
           <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">

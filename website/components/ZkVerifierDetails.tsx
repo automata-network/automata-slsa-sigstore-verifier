@@ -24,7 +24,7 @@ const ZKVM_COMMANDS = {
   },
   SP1: {
     build: 'cargo build -p sp1-host --release',
-    prove: 'cargo run -p sp1-host --release -- prove \\\n  --bundle ./attestation.json \\\n  --trust-roots ./trusted-root.json \\\n --output ./output/boundless-proof.json \\\n  network',
+    prove: 'cargo run -p sp1-host --release -- prove \\\n  --bundle ./attestation.json \\\n  --trust-roots ./trusted-root.json \\\n --output ./output/boundless-proof.json \\\n',
     imageId: 'cargo run -p sp1-host -- verifying-key',
   },
   Pico: {

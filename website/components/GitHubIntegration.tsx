@@ -30,7 +30,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build artifact
         run: |
@@ -38,7 +38,7 @@ jobs:
           echo "built" > artifact.txt
 
       - name: Attest build provenance
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: artifact.txt`}
         />
@@ -51,20 +51,31 @@ jobs:
           Step 2: Download Bundles
         </h3>
         <p className="text-slate-400 mb-4">
-          After GitHub Actions generates the attestation, download the Sigstore bundle using the GitHub CLI or API.
+          After GitHub Actions generates the attestation, download the Sigstore bundle using the <a href="https://cli.github.com" target="_blank" rel="noopener noreferrer" className="text-orange-400 underline"> GitHub CLI </a>.
         </p>
         <div className="space-y-3">
           <CodeExample
             language="bash"
-            title="Download using GitHub CLI (recommended)"
-            code={`# Install GitHub CLI first: https://cli.github.com
-gh attestation download <artifact-url> --format json > bundle.sigstore.json`}
+            title="Using local artifact path"
+            code={`gh attestation download local/path/to/artifact -R OWNER/REPO`}
           />
+
+          <p> OR </p>
+
           <CodeExample
             language="bash"
-            title="Download using GitHub API"
-            code={`gh api repos/{owner}/{repo}/attestations --jq '.attestations[] | .bundle' > bundle.sigstore.json`}
+            title="Using container image URI"
+            code={`gh attestation download oci://<image-uri> -R OWNER/REPO`}
           />
+
+          <p> OR </p>
+
+          <CodeExample
+            language="bash"
+            title="Using CURL directly from GitHub"
+            code={`curl https://github.com/OWNER/REPO/attestations/<attestation-id>/download > bundle.json`}
+          />
+          
         </div>
       </div>
 
