@@ -15,8 +15,8 @@ contract SigstoreTest is Test {
     SigstoreAttestationVerifier sigstoreVerifier;
     address admin = address(1);
 
-    bytes32 constant RISC0_IMAGE_ID = 0x9635bbc29e531f8ad7f2cc3fa18dcc7f08b2f74de5a189f2d394e581dcf524f3;
-    bytes32 constant SP1_VKEY = 0x00204312c6f7cbbc6eaf391a6660787279ea049bb7078694d5c62a8c5aa44dc9;
+    bytes32 constant RISC0_IMAGE_ID = 0xddcec7db184cde2e6d8419f795308f6cf849626434be292e2adff357efaee0ef;
+    bytes32 constant SP1_VKEY = 0x0081d74e3b06e31064884f3441929c5279eaae8e1dcf9a51874af1262b6c11eb;
 
     event AttestationSubmitted(ZkCoProcessorType verifierType, bytes output);
 
