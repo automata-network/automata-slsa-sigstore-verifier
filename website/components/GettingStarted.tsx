@@ -28,9 +28,9 @@ const GettingStarted: React.FC = () => {
                 Use GitHub Actions to automatically generate Sigstore attestations during your build process.
               </p>
             </div>
-            <div className="lg:col-span-8">
-              <CodeBlock 
-                language="yaml" 
+            <div className="lg:col-span-8 min-w-0">
+              <CodeBlock
+                language="yaml"
                 title="GitHub Actions Workflow"
                 code={`name: Build and Attest
 on: [push]
@@ -101,7 +101,7 @@ jobs:
               </div>
 
             </div>
-            <div className="lg:col-span-8 space-y-4">
+            <div className="lg:col-span-8 min-w-0 space-y-4">
               <CodeBlock
                 language="bash"
                 title="Using local artifact path"
@@ -132,9 +132,9 @@ jobs:
                 <span className="block mt-2 text-zinc-500 text-sm">Recommended: Refresh every 60-90 days.</span>
               </p>
             </div>
-            <div className="lg:col-span-8">
-              <CodeBlock 
-                language="bash" 
+            <div className="lg:col-span-8 min-w-0">
+              <CodeBlock
+                language="bash"
                 title="Fetch Trust Roots"
                 code={`gh attestation trusted-root > trusted_root.jsonl`}
               />

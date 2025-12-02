@@ -58,7 +58,7 @@ const ZkVerification: React.FC = () => {
                 </p>
               </div>
               <div className="grid lg:grid-cols-2 gap-8">
-                <div>
+                <div className="min-w-0">
                   <h4 className="text-white font-bold mb-2">Input 1: Attestation Bundle</h4>
                   <p className="text-sm text-zinc-500 mb-4">Generated directly by the attest-build-provenance GitHub Action.</p>
                   <CodeBlock
@@ -73,7 +73,7 @@ const ZkVerification: React.FC = () => {
 }`}
                   />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="text-white font-bold mb-2">Input 2: Trust Roots</h4>
                   <p className="text-sm text-zinc-500 mb-4">Obtained via CLI: <code className="text-orange-400">gh attestation trusted-root</code></p>
                   <CodeBlock

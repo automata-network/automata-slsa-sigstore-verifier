@@ -668,13 +668,15 @@ const TimestampingContent: React.FC = () => (
           <p className="text-sm text-zinc-400 mb-4">
             An inclusion proof demonstrates that a specific entry exists in the log without downloading the entire tree.
           </p>
-          <div className="text-xs text-zinc-500 space-y-1 font-mono bg-zinc-950 p-3 rounded">
-            <p>To prove Entry 2 is in the tree:</p>
-            <p className="text-zinc-400">1. Provide: H(A), H(CD), and Entry 2</p>
-            <p className="text-zinc-400">2. Compute: H(B) from Entry 2</p>
-            <p className="text-zinc-400">3. Compute: H(AB) = H(H(A) || H(B))</p>
-            <p className="text-zinc-400">4. Compute: Root = H(H(AB) || H(CD))</p>
-            <p className="text-emerald-400">5. Match root → Entry is included</p>
+          <div className="overflow-x-auto">
+            <div className="text-xs text-zinc-500 space-y-1 font-mono bg-zinc-950 p-3 rounded min-w-[280px]">
+              <p>To prove Entry 2 is in the tree:</p>
+              <p className="text-zinc-400">1. Provide: H(A), H(CD), and Entry 2</p>
+              <p className="text-zinc-400">2. Compute: H(B) from Entry 2</p>
+              <p className="text-zinc-400">3. Compute: H(AB) = H(H(A) || H(B))</p>
+              <p className="text-zinc-400">4. Compute: Root = H(H(AB) || H(CD))</p>
+              <p className="text-emerald-400">5. Match root → Entry is included</p>
+            </div>
           </div>
         </div>
 
