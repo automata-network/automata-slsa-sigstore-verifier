@@ -132,16 +132,16 @@ jobs:
                 </div>
                 <div>
                     <h3 className="text-xl font-bold text-white">Private Repositories</h3>
-                    <p className="text-sm text-orange-400">GitHub Internal CA</p>
+                    <p className="text-sm text-orange-400">Github Instance</p>
                 </div>
             </div>
-            
+
             <ul className="space-y-4">
                 <li className="flex items-start gap-3">
                     <FileCheck className="w-5 h-5 text-slate-400 mt-1" />
                     <div>
                         <span className="text-slate-200 font-medium">Fulcio Issuer</span>
-                        <p className="text-sm text-slate-400">GitHub's own CA</p>
+                        <p className="text-sm text-slate-400">GitHub Internal Services Root</p>
                     </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -155,7 +155,7 @@ jobs:
                     <GitBranch className="w-5 h-5 text-slate-400 mt-1" />
                     <div>
                         <span className="text-slate-200 font-medium">Privacy</span>
-                        <p className="text-sm text-slate-400">Metadata is kept private; not posted to public logs.</p>
+                        <p className="text-sm text-slate-400">Signed Timestamp is kept private; not posted to public logs.</p>
                     </div>
                 </li>
             </ul>

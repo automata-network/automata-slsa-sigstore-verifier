@@ -55,8 +55,9 @@ const CodeIntegration: React.FC = () => {
               <pre className="p-4 text-sm overflow-x-auto">
                 <code className="text-orange-300">[dependencies]</code>
                 {'\n'}
-                <code className="text-slate-300">sigstore-verifier = </code>
-                <code className="text-emerald-400">"0.1.0"</code>
+                <code className="text-slate-300">sigstore-verifier = {'{'} git = </code>
+                <code className="text-emerald-400">"https://github.com/automata-network/automata-attest-build-verifier"</code>
+                <code className="text-slate-300"> {'}'}</code>
               </pre>
             </div>
           </div>
@@ -67,13 +68,27 @@ const CodeIntegration: React.FC = () => {
               <div className="px-4 py-2 border-b border-slate-700 text-xs text-slate-400">
                 main.rs
               </div>
-              <pre className="p-4 text-sm overflow-x-auto">
+              <pre className="p-4 text-sm overflow-x-auto whitespace-pre">
                 <code className="text-blue-400">use</code>
-                <code className="text-slate-300"> sigstore_verifier::</code>
+                <code className="text-slate-300"> std::path::Path;</code>
+                {'\n'}
+                <code className="text-blue-400">use</code>
+                <code className="text-slate-300"> sigstore_verifier::AttestationVerifier;</code>
+                {'\n'}
+                <code className="text-blue-400">use</code>
+                <code className="text-slate-300"> sigstore_verifier::fetcher::jsonl::parser::</code>
                 <code className="text-amber-300">{'{'}</code>
-                <code className="text-slate-300">verify_bundle, TrustRoot, Bundle</code>
+                {'\n'}
+                <code className="text-slate-300">    load_trusted_root_from_jsonl, select_certificate_authority, select_timestamp_authority,</code>
+                {'\n'}
                 <code className="text-amber-300">{'}'}</code>
                 <code className="text-slate-300">;</code>
+                {'\n'}
+                <code className="text-blue-400">use</code>
+                <code className="text-slate-300"> sigstore_verifier::types::certificate::FulcioInstance;</code>
+                {'\n'}
+                <code className="text-blue-400">use</code>
+                <code className="text-slate-300"> sigstore_verifier::types::result::VerificationOptions;</code>
                 {'\n\n'}
                 <code className="text-blue-400">fn</code>
                 <code className="text-emerald-400"> main</code>
@@ -81,25 +96,93 @@ const CodeIntegration: React.FC = () => {
                 {'\n'}
                 <code className="text-slate-300">    </code>
                 <code className="text-blue-400">let</code>
-                <code className="text-slate-300"> bundle = Bundle::from_json(bundle_json);</code>
+                <code className="text-slate-300"> verifier = AttestationVerifier::new();</code>
+                {'\n\n'}
+                <code className="text-slate-500">    // Load trust roots from JSONL file</code>
                 {'\n'}
                 <code className="text-slate-300">    </code>
                 <code className="text-blue-400">let</code>
-                <code className="text-slate-300"> trust_root = TrustRoot::from_json(trust_json);</code>
-                {'\n\n'}
+                <code className="text-slate-300"> trust_roots_content = fs::read_to_string(</code>
+                <code className="text-emerald-400">"/path/to/trusted-root.jsonl"</code>
+                <code className="text-slate-300">);</code>
+                {'\n'}
                 <code className="text-slate-300">    </code>
                 <code className="text-blue-400">let</code>
-                <code className="text-slate-300"> result = verify_bundle(&bundle, &trust_root)</code>
+                <code className="text-slate-300"> trust_roots = load_trusted_root_from_jsonl(&trust_roots_content)</code>
                 {'\n'}
                 <code className="text-slate-300">        .expect(</code>
+                <code className="text-emerald-400">"Failed to parse trusted root JSONL"</code>
+                <code className="text-slate-300">);</code>
+                {'\n\n'}
+                <code className="text-slate-500">    // Auto-detect Fulcio instance from bundle</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> bundle_path = </code>
+                <code className="text-emerald-400">"path/to/bundle.json"</code>
+                <code className="text-slate-300">;</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> bundle_json = std::fs::read_to_string(&bundle_path).expect(</code>
+                <code className="text-emerald-400">"Failed to read bundle"</code>
+                <code className="text-slate-300">);</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> fulcio_instance = FulcioInstance::from_bundle_json(&bundle_json)</code>
+                {'\n'}
+                <code className="text-slate-300">        .expect(</code>
+                <code className="text-emerald-400">"Failed to detect Fulcio instance"</code>
+                <code className="text-slate-300">);</code>
+                {'\n\n'}
+                <code className="text-slate-500">    // Select certificate authorities based on timestamp</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> fulcio_chain = select_certificate_authority(&trust_roots, &fulcio_instance, timestamp)</code>
+                {'\n'}
+                <code className="text-slate-300">        .expect(</code>
+                <code className="text-emerald-400">"Failed to select certificate authority"</code>
+                <code className="text-slate-300">);</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> tsa_chain = select_timestamp_authority(&trust_roots, &fulcio_instance, timestamp);</code>
+                {'\n\n'}
+                <code className="text-slate-500">    // Verify the bundle</code>
+                {'\n'}
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">let</code>
+                <code className="text-slate-300"> result = verifier.verify_bundle(</code>
+                {'\n'}
+                <code className="text-slate-300">        Path::new(&bundle_path),</code>
+                {'\n'}
+                <code className="text-slate-300">        VerificationOptions::default(),</code>
+                {'\n'}
+                <code className="text-slate-300">        &fulcio_chain,</code>
+                {'\n'}
+                <code className="text-slate-300">        tsa_chain.as_ref(),</code>
+                {'\n'}
+                <code className="text-slate-300">    ).expect(</code>
                 <code className="text-emerald-400">"verification failed"</code>
                 <code className="text-slate-300">);</code>
                 {'\n\n'}
                 <code className="text-slate-500">    // Access verified OIDC identity</code>
                 {'\n'}
-                <code className="text-slate-300">    println!(</code>
-                <code className="text-emerald-400">"Repository: {'{}'}"</code>
-                <code className="text-slate-300">, result.oidc_repository);</code>
+                <code className="text-slate-300">    </code>
+                <code className="text-blue-400">if let</code>
+                <code className="text-slate-300"> Some(ref oidc) = result.oidc_identity {'{'}</code>
+                {'\n'}
+                <code className="text-slate-300">        println!(</code>
+                <code className="text-emerald-400">"Repository: {'{:?}'}"</code>
+                <code className="text-slate-300">, oidc.repository);</code>
+                {'\n'}
+                <code className="text-slate-300">        println!(</code>
+                <code className="text-emerald-400">"Issuer: {'{:?}'}"</code>
+                <code className="text-slate-300">, oidc.issuer);</code>
+                {'\n'}
+                <code className="text-slate-300">    {'}'}</code>
                 {'\n'}
                 <code className="text-slate-300">{'}'}</code>
               </pre>

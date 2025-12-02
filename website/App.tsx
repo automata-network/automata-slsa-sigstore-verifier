@@ -107,8 +107,8 @@ const App: React.FC = () => {
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400">Prove it on-chain.</span>
                 </h1>
                 <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-400">
-                    The missing link between GitHub Actions and Smart Contracts. 
-                    We verify Sigstore attestations inside zkVMs to bring software supply chain security to the blockchain.
+                    The missing link between GitHub Actions and Smart Contracts.
+                    We verify Sigstore SLSA attestations inside zkVMs to bring software supply chain security to the blockchain.
                 </p>
                 <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4 px-4 sm:px-0">
                     <a href="#protocol" className="w-full sm:w-auto text-center px-8 py-3 rounded-lg bg-white text-slate-900 font-semibold hover:bg-slate-200 transition-colors">
@@ -157,8 +157,8 @@ const App: React.FC = () => {
                 <div className="mb-16">
                     <h2 className="text-3xl font-bold text-white mb-4">Zero-Knowledge Verification</h2>
                     <p className="text-slate-400 max-w-3xl">
-                        We built a portable Rust library that verifies Sigstore bundles within Zero-Knowledge Virtual Machines (RISC0, SP1, and Pico).
-                        The verifier generates Groth16 SNARK proofs containing certificate hashes, OIDC identity, and timestamp data,
+                        We built a portable Rust library that verifies Sigstore bundles that be executed within Zero-Knowledge Virtual Machines (RISC0, SP1, and Pico).
+                        The zkVM verifier generates Groth16 SNARK proofs containing certificate hashes, OIDC identity, and timestamp data,
                         enabling <span className="text-orange-400 font-semibold">Proof of Provenance</span> on Ethereum and other blockchains.
                     </p>
                 </div>
@@ -175,7 +175,7 @@ const App: React.FC = () => {
         </section>
 
         <footer className="bg-slate-950 py-12 border-t border-slate-800 text-center">
-            <p className="text-slate-500 text-sm">© 2025 Sigstore Attest. Built for the community.</p>
+            <p className="text-slate-500 text-sm">© 2025 Automata Sigstore Attest. Built for the community.</p>
         </footer>
 
       </main>

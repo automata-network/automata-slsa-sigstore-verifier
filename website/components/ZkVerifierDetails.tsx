@@ -10,7 +10,7 @@ const OUTPUT_FIELDS: VerificationOutputField[] = [
     { id: 5, label: "OIDC Repository", description: "The repo where the action ran.", technicalKey: "repository" },
     { id: 6, label: "OIDC Event Name", description: "Trigger event (e.g., 'push', 'release').", technicalKey: "event_name" },
     { id: 7, label: "TSA Certificate Hash Chain", description: "RFC 3161 only. Array of SHA256 certificate hashes, leaf first, root last..", technicalKey: "tsa_certs" },
-    { id: 8, label: "Message Imprint", description: "RFC 3161 only. Hash of DSSE Payload.", technicalKey: "message_imprint" },
+    { id: 8, label: "Message Imprint", description: "RFC 3161 only. Hash of DSSE Signature.", technicalKey: "message_imprint" },
     { id: 9, label: "Rekor Log ID", description: "Unique ID of the transparency log.", technicalKey: "log_id" },
     { id: 10, label: "Rekor Entry Index", description: "Position in the log.", technicalKey: "log_index" },
     { id: 11, label: "Rekor Integrated Time", description: "The exact timestamp when the entry is included in the Rekor Log Merkle Tree", technicalKey: "integrated_time" },
@@ -90,9 +90,9 @@ const ZkVerifierDetails: React.FC = () => {
                         <div className="text-blue-400 font-bold mb-2">// 1. Attestation Bundle</div>
                         <pre className="text-slate-500 overflow-x-auto whitespace-pre">{`{
   "mediaType": "application/vnd.dev.sigstore.bundle+json;version=0.3",
-  "verificationMaterial": { ... },
+  "verificationMaterial": { ... }, // RFC 3161 or Rekor Logs
   "dsseEnvelope": {
-    "payload": "...",
+    "payload": "...", // in-toto statement
     "signatures": [ ... ]
   }
 }`}</pre>
