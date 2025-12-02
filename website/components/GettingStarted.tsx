@@ -4,25 +4,25 @@ import { Shield, Download, Key, Globe, Lock } from 'lucide-react';
 
 const GettingStarted: React.FC = () => {
   return (
-    <section id="bundles" className="py-24 border-b border-zinc-900 bg-black">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        <div className="mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Getting Started: Bundles & Trust Roots</h2>
+    <section id="bundles" className="py-16 md:py-24 border-b border-zinc-900 bg-black overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+
+        <div className="mb-12 md:mb-16">
+          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 md:mb-6">Getting Started: Bundles & Trust Roots</h2>
           <p className="text-zinc-400 max-w-3xl leading-relaxed">
             Generate attestations with GitHub Actions, download bundles with GitHub CLI, and fetch trust roots for verification.
             Our implementation supports both public and private repository workflows.
           </p>
         </div>
 
-        <div className="space-y-20">
-          
+        <div className="space-y-12 md:space-y-20">
+
           {/* Step 1 */}
-          <div className="grid lg:grid-cols-12 gap-12">
+          <div className="grid lg:grid-cols-12 gap-6 md:gap-12">
             <div className="lg:col-span-4">
               <div className="flex items-center gap-3 mb-4 text-orange-500">
-                <Shield className="w-6 h-6" />
-                <h3 className="text-xl font-bold text-white">Step 1: Generate Attestations</h3>
+                <Shield className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" />
+                <h3 className="text-lg md:text-xl font-bold text-white">Step 1: Generate Attestations</h3>
               </div>
               <p className="text-zinc-400 mb-6">
                 Use GitHub Actions to automatically generate Sigstore attestations during your build process.
@@ -60,11 +60,11 @@ jobs:
           </div>
 
           {/* Step 2 */}
-          <div className="grid lg:grid-cols-12 gap-12">
+          <div className="grid lg:grid-cols-12 gap-6 md:gap-12">
             <div className="lg:col-span-4">
               <div className="flex items-center gap-3 mb-4 text-blue-500">
-                <Download className="w-6 h-6" />
-                <h3 className="text-xl font-bold text-white">Step 2: Download Bundles</h3>
+                <Download className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" />
+                <h3 className="text-lg md:text-xl font-bold text-white">Step 2: Download Bundles</h3>
               </div>
               <p className="text-zinc-400 mb-6">
                 After GitHub Actions generates the attestation, download the Sigstore bundle using the GitHub CLI.
@@ -121,11 +121,11 @@ jobs:
           </div>
 
           {/* Step 3 */}
-          <div className="grid lg:grid-cols-12 gap-12">
+          <div className="grid lg:grid-cols-12 gap-6 md:gap-12">
             <div className="lg:col-span-4">
               <div className="flex items-center gap-3 mb-4 text-orange-500">
-                <Key className="w-6 h-6" />
-                <h3 className="text-xl font-bold text-white">Step 3: Get Trust Roots</h3>
+                <Key className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" />
+                <h3 className="text-lg md:text-xl font-bold text-white">Step 3: Get Trust Roots</h3>
               </div>
               <p className="text-zinc-400 mb-6">
                 Trust roots contain the Fulcio CA certificates and Timestamp Authority certificates needed to verify the attestation. 

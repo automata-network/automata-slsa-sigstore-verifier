@@ -7,15 +7,15 @@ const ZkVerification: React.FC = () => {
   const [vm, setVm] = useState<'risc0' | 'sp1' | 'pico'>('risc0');
 
   return (
-    <section id="verifier" className="py-24 border-b border-zinc-900 bg-zinc-950 relative overflow-hidden">
-      
-      {/* Decorative gradient */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-900/10 blur-[100px] rounded-full pointer-events-none" />
+    <section id="verifier" className="py-16 md:py-24 border-b border-zinc-900 bg-zinc-950 relative overflow-hidden">
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Zero-Knowledge Verification</h2>
+      {/* Decorative gradient */}
+      <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-orange-900/10 blur-[100px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+
+        <div className="mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-4xl font-bold text-white mb-4 md:mb-6">Zero-Knowledge Verification</h2>
           <p className="text-zinc-400 max-w-3xl leading-relaxed">
             We built a portable Rust library that verifies Sigstore bundles within Zero-Knowledge Virtual Machines (RISC0, SP1, and Pico).
             The zkVM verifier generates Groth16 SNARK proofs enabling <span className="text-orange-500 font-medium">Proof of Provenance</span> on Ethereum.
@@ -23,22 +23,22 @@ const ZkVerification: React.FC = () => {
         </div>
 
         {/* Tab Header */}
-        <div className="flex flex-wrap border-b border-zinc-800 mb-8">
+        <div className="flex flex-wrap border-b border-zinc-800 mb-6 md:mb-8 -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto">
           {[
             { id: 'inputs', label: 'Inputs', icon: FileJson },
-            { id: 'process', label: 'zkVM Process', icon: Cpu },
+            { id: 'process', label: 'zkVM', icon: Cpu },
             { id: 'outputs', label: 'Outputs', icon: Terminal },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-6 py-4 font-mono text-sm uppercase tracking-wide transition-colors border-b-2 ${
-                activeTab === tab.id 
-                  ? 'border-orange-500 text-white bg-zinc-900/50' 
+              className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-3 md:py-4 font-mono text-xs md:text-sm uppercase tracking-wide transition-colors border-b-2 whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-orange-500 text-white bg-zinc-900/50'
                   : 'border-transparent text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <tab.icon size={16} />
+              <tab.icon size={14} className="md:w-4 md:h-4" />
               {tab.label}
             </button>
           ))}
@@ -101,12 +101,12 @@ const ZkVerification: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-2 md:gap-4 mb-6 overflow-x-auto pb-2">
                 {['risc0', 'sp1', 'pico'].map((v) => (
                   <button
                     key={v}
                     onClick={() => setVm(v as any)}
-                    className={`px-4 py-2 text-sm font-mono border ${
+                    className={`px-3 md:px-4 py-2 text-xs md:text-sm font-mono border whitespace-nowrap ${
                       vm === v
                         ? 'border-white text-white'
                         : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'
@@ -117,7 +117,7 @@ const ZkVerification: React.FC = () => {
                 ))}
               </div>
 
-              <div className="bg-zinc-900/30 border border-zinc-800 p-6 mb-8">
+              <div className="bg-zinc-900/30 border border-zinc-800 p-4 md:p-6 mb-6 md:mb-8">
                 {vm === 'risc0' && (
                   <CodeBlock
                     language="bash"
@@ -162,18 +162,18 @@ cargo run -p pico-host --release -- prove --bundle ./attestation.json --trust-ro
                 )}
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6 border-t border-zinc-800 pt-8">
+              <div className="grid md:grid-cols-3 gap-4 md:gap-6 border-t border-zinc-800 pt-6 md:pt-8">
                 <div>
                   <div className="text-orange-500 font-mono text-xs mb-2">01 EXECUTION</div>
-                  <p className="text-sm text-zinc-400">The Rust verifier runs inside the zkVM guest program. It parses the Sigstore bundle, verifies the DSSE signature, validates the certificate chain (leaf → intermediates → root), verifies the timestamp proof (RFC3161 or Rekor), and extracts OIDC identity from certificate extensions.</p>
+                  <p className="text-xs md:text-sm text-zinc-400">The Rust verifier runs inside the zkVM guest program. It parses the Sigstore bundle, verifies the DSSE signature, validates the certificate chain, and extracts OIDC identity.</p>
                 </div>
                 <div>
                   <div className="text-orange-500 font-mono text-xs mb-2">02 PROOF GENERATION</div>
-                  <p className="text-sm text-zinc-400">A Groth16 ZK-SNARK proof is generated, cryptographically proving the verification succeeded. The journal (public output) contains the VerificationResult with certificate hashes, OIDC identity, and timestamp data.</p>
+                  <p className="text-xs md:text-sm text-zinc-400">A Groth16 ZK-SNARK proof is generated, proving verification succeeded. The journal contains certificate hashes, OIDC identity, and timestamp data.</p>
                 </div>
                 <div>
                   <div className="text-orange-500 font-mono text-xs mb-2">03 ON-CHAIN VERIFICATION</div>
-                  <p className="text-sm text-zinc-400">The proof and journal are submitted to a smart contract. The contract verifies the ZK proof, parses the VerificationResult, and emits an attestation event. Other contracts can then use the verified data for access control, governance, or compliance.</p>
+                  <p className="text-xs md:text-sm text-zinc-400">The proof is submitted to a smart contract. The contract verifies it and emits an attestation event for downstream logic.</p>
                 </div>
               </div>
             </div>
@@ -182,13 +182,13 @@ cargo run -p pico-host --release -- prove --bundle ./attestation.json --trust-ro
           {/* TAB 3: OUTPUTS */}
           {activeTab === 'outputs' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="mb-8">
-                <h3 className="text-xl font-bold text-white mb-2">Verification Data Structure</h3>
-                <p className="text-zinc-400 mb-6">
-                  The VerificationResult contains all cryptographic evidence and identity information, organized into categories for easy access.
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2">Verification Data Structure</h3>
+                <p className="text-sm md:text-base text-zinc-400 mb-4 md:mb-6">
+                  The VerificationResult contains all cryptographic evidence and identity information.
                 </p>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm border-collapse">
+                <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+                  <table className="w-full text-left text-xs md:text-sm border-collapse min-w-[500px]">
                     <thead>
                       <tr className="border-b border-zinc-800 text-zinc-500 font-mono text-xs uppercase">
                         <th className="py-3 pr-4">Category</th>
@@ -263,26 +263,26 @@ cargo run -p pico-host --release -- prove --bundle ./attestation.json --trust-ro
 
               {/* On-Chain Use Cases */}
               <div>
-                <h4 className="text-lg font-bold text-white mb-2">On-Chain Use Cases</h4>
-                <p className="text-zinc-400 text-sm mb-4">
+                <h4 className="text-base md:text-lg font-bold text-white mb-2">On-Chain Use Cases</h4>
+                <p className="text-zinc-400 text-xs md:text-sm mb-4">
                   Smart contracts can leverage the verified data for various security and governance applications.
                 </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 border border-zinc-800 bg-zinc-900/20">
-                    <h5 className="font-bold text-white mb-2">Supply Chain Security</h5>
-                    <p className="text-sm text-zinc-400">Verify artifacts were built by authorized CI/CD pipelines before deployment. Check oidcRepository and oidcWorkflowRef match your security policy.</p>
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                  <div className="p-3 md:p-4 border border-zinc-800 bg-zinc-900/20">
+                    <h5 className="font-bold text-white text-sm md:text-base mb-1 md:mb-2">Supply Chain Security</h5>
+                    <p className="text-xs md:text-sm text-zinc-400">Verify artifacts were built by authorized CI/CD pipelines before deployment.</p>
                   </div>
-                  <div className="p-4 border border-zinc-800 bg-zinc-900/20">
-                    <h5 className="font-bold text-white mb-2">Governance</h5>
-                    <p className="text-sm text-zinc-400">Time-lock contract execution based on build timestamps. Require artifacts built after security audit completion using the timestamp field.</p>
+                  <div className="p-3 md:p-4 border border-zinc-800 bg-zinc-900/20">
+                    <h5 className="font-bold text-white text-sm md:text-base mb-1 md:mb-2">Governance</h5>
+                    <p className="text-xs md:text-sm text-zinc-400">Time-lock contract execution based on build timestamps.</p>
                   </div>
-                  <div className="p-4 border border-zinc-800 bg-zinc-900/20">
-                    <h5 className="font-bold text-white mb-2">Access Control</h5>
-                    <p className="text-sm text-zinc-400">Grant permissions only to artifacts from specific GitHub repositories. Validate OIDC identity fields match organization requirements before executing privileged operations.</p>
+                  <div className="p-3 md:p-4 border border-zinc-800 bg-zinc-900/20">
+                    <h5 className="font-bold text-white text-sm md:text-base mb-1 md:mb-2">Access Control</h5>
+                    <p className="text-xs md:text-sm text-zinc-400">Grant permissions only to artifacts from specific GitHub repositories.</p>
                   </div>
-                  <div className="p-4 border border-zinc-800 bg-zinc-900/20">
-                    <h5 className="font-bold text-white mb-2">Artifact Registry</h5>
-                    <p className="text-sm text-zinc-400">Maintain on-chain directory of verified builds. Query by certificate hashes, repository, or timestamp for trustless artifact discovery and provenance tracking.</p>
+                  <div className="p-3 md:p-4 border border-zinc-800 bg-zinc-900/20">
+                    <h5 className="font-bold text-white text-sm md:text-base mb-1 md:mb-2">Artifact Registry</h5>
+                    <p className="text-xs md:text-sm text-zinc-400">Maintain on-chain directory of verified builds for trustless discovery.</p>
                   </div>
                 </div>
               </div>

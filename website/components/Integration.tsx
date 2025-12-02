@@ -6,20 +6,20 @@ const Integration: React.FC = () => {
   const [lang, setLang] = useState<'rust' | 'solidity'>('rust');
 
   return (
-    <section id="integration" className="py-24 border-b border-zinc-900 bg-black">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        <div className="flex items-center gap-3 mb-8 text-orange-500">
-          <Code2 className="w-8 h-8" />
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Code Integration</h2>
+    <section id="integration" className="py-16 md:py-24 border-b border-zinc-900 bg-black overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+
+        <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8 text-orange-500">
+          <Code2 className="w-6 h-6 md:w-8 md:h-8 flex-shrink-0" />
+          <h2 className="text-2xl md:text-4xl font-bold text-white">Code Integration</h2>
         </div>
 
-        <div className="flex gap-1 border-b border-zinc-800 mb-8">
+        <div className="flex gap-1 border-b border-zinc-800 mb-6 md:mb-8">
           <button
             onClick={() => setLang('rust')}
-            className={`px-8 py-3 text-sm font-medium transition-all ${
-              lang === 'rust' 
-                ? 'bg-zinc-900 text-white border-t border-x border-zinc-800 rounded-t' 
+            className={`px-4 md:px-8 py-2 md:py-3 text-sm font-medium transition-all ${
+              lang === 'rust'
+                ? 'bg-zinc-900 text-white border-t border-x border-zinc-800 rounded-t'
                 : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
@@ -27,9 +27,9 @@ const Integration: React.FC = () => {
           </button>
           <button
             onClick={() => setLang('solidity')}
-            className={`px-8 py-3 text-sm font-medium transition-all ${
-              lang === 'solidity' 
-                ? 'bg-zinc-900 text-white border-t border-x border-zinc-800 rounded-t' 
+            className={`px-4 md:px-8 py-2 md:py-3 text-sm font-medium transition-all ${
+              lang === 'solidity'
+                ? 'bg-zinc-900 text-white border-t border-x border-zinc-800 rounded-t'
                 : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
@@ -37,12 +37,12 @@ const Integration: React.FC = () => {
           </button>
         </div>
 
-        <div className="min-h-[500px]">
+        <div className="min-h-[400px] md:min-h-[500px]">
           {lang === 'rust' ? (
              <div className="animate-in fade-in duration-300">
-               <div className="mb-8">
-                 <h3 className="text-xl text-white mb-2">Rust Verifier Library</h3>
-                 <p className="text-zinc-400 mb-4">Add the verifier library to your Cargo.toml and use it in your Rust project.</p>
+               <div className="mb-6 md:mb-8">
+                 <h3 className="text-lg md:text-xl text-white mb-2">Rust Verifier Library</h3>
+                 <p className="text-sm md:text-base text-zinc-400 mb-4">Add the verifier library to your Cargo.toml and use it in your Rust project.</p>
                  <CodeBlock
                   language="toml"
                   title="Cargo.toml"
@@ -51,7 +51,7 @@ sigstore-verifier = { git = "https://github.com/automata-network/automata-attest
                  />
                </div>
                <div>
-                 <h3 className="text-xl text-white mb-2">Usage Example</h3>
+                 <h3 className="text-lg md:text-xl text-white mb-2">Usage Example</h3>
                  <CodeBlock
                   language="rust"
                   title="main.rs"
@@ -107,17 +107,17 @@ fn main() {
              </div>
           ) : (
             <div className="animate-in fade-in duration-300">
-              <div className="mb-8">
-                 <h3 className="text-xl text-white mb-2">Solidity Verifier Contracts</h3>
-                 <p className="text-zinc-400 mb-4">Install the contracts package and configure the remapping in your Foundry project.</p>
+              <div className="mb-6 md:mb-8">
+                 <h3 className="text-lg md:text-xl text-white mb-2">Solidity Verifier Contracts</h3>
+                 <p className="text-sm md:text-base text-zinc-400 mb-4">Install the contracts package and configure the remapping in your Foundry project.</p>
                  <CodeBlock
                   language="bash"
                   title="Terminal"
                   code={`forge install automata-network/automata-attest-build-verifier`}
                  />
                </div>
-               <div className="mb-8">
-                 <h3 className="text-xl text-white mb-2">Remapping Configuration</h3>
+               <div className="mb-6 md:mb-8">
+                 <h3 className="text-lg md:text-xl text-white mb-2">Remapping Configuration</h3>
                  <CodeBlock
                   language="text"
                   title="remappings.txt"
@@ -125,7 +125,7 @@ fn main() {
                  />
                </div>
                <div>
-                 <h3 className="text-xl text-white mb-2">Usage Example</h3>
+                 <h3 className="text-lg md:text-xl text-white mb-2">Usage Example</h3>
                  <CodeBlock
                   language="solidity"
                   title="MyContract.sol"
