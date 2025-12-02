@@ -1,5 +1,5 @@
 {
-  "name": "Sigstore zkVM Explainer",
-  "description": "An educational platform explaining the Sigstore protocol and a custom Rust-based zkVM verifier implementation for secure software supply chains.",
+  "name": "Automata Sigstore Attest",
+  "description": "A high-end, monochrome aesthetic documentation site for Automata's Sigstore Attestation protocol featuring procedural halftone visualization.",
   "requestFramePermissions": []
 }

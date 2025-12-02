@@ -1,26 +1,16 @@
-export interface NavItem {
+export interface NavLink {
   label: string;
-  id: string;
+  href: string;
 }
 
-export interface VerificationOutputField {
-  id: number;
-  label: string;
-  description: string;
-  technicalKey: string;
+export interface CodeSnippet {
+  language: 'bash' | 'yaml' | 'json' | 'rust' | 'solidity';
+  code: string;
+  title?: string;
 }
 
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'model';
-  text: string;
-  timestamp: Date;
-}
-
-export enum SectionId {
-  HERO = 'hero',
-  PROTOCOL = 'protocol',
-  BUNDLES = 'bundles',
-  VERIFIER = 'verifier',
-  CHAT = 'chat'
+export enum TabOption {
+  INPUTS = 'INPUTS',
+  PROCESS = 'ZK PROCESS',
+  OUTPUTS = 'OUTPUTS'
 }
