@@ -131,13 +131,12 @@ pub async fn prove_with_boundless(
     }
 
     // Set offer params if any are provided
+    let mut offer_builder = OfferParams::builder();
     if config.min_price.is_some()
         || config.max_price.is_some()
         || config.timeout.is_some()
         || config.ramp_up_period.is_some()
     {
-        let mut offer_builder = OfferParams::builder();
-
         if let Some(min_price) = config.min_price {
             println!("💰 Min price: {} wei", min_price);
             offer_builder.min_price(U256::from(min_price));
@@ -157,9 +156,13 @@ pub async fn prove_with_boundless(
             println!("📈 Ramp-up period: {} seconds", ramp_up_period);
             offer_builder.ramp_up_period(ramp_up_period);
         }
-
-        request_builder = request_builder.with_offer(offer_builder);
     }
+
+    // hardcode collateral default at 10 $ZKC
+    let collateral_amount = parse_units("10", "ether").unwrap();
+    offer_builder.lock_collateral(collateral_amount);
+
+    request_builder = request_builder.with_offer(offer_builder.build()?);
 
     println!("🚀 Submitting proof request to Boundless...");
 
