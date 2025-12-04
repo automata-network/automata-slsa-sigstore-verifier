@@ -8,7 +8,8 @@ enum ZkCoProcessorType {
     // it indicates that the attestation of the DCAP quote is executed entirely on-chain
     None,
     RiscZero,
-    Succinct
+    Succinct,
+    Pico
 }
 
 /**

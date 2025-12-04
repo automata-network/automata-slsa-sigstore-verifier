@@ -8,6 +8,7 @@ import {Ownable} from "solady/auth/Ownable.sol";
 // ZK-Coprocessor imports:
 import {IRiscZeroVerifier} from "risc0/IRiscZeroVerifier.sol";
 import {ISP1Verifier} from "@sp1-contracts/ISP1Verifier.sol";
+import {IPicoVerifier} from "./zk/pico/interfaces/IPicoVerifier.sol";
 
 contract SigstoreAttestationVerifier is ISigstoreAttestationVerifier, Ownable {
     mapping(ZkCoProcessorType => ZkCoProcessorConfig) _zkConfig;
@@ -58,6 +59,9 @@ contract SigstoreAttestationVerifier is ISigstoreAttestationVerifier, Ownable {
             IRiscZeroVerifier(config.zkVerifier).verify(proofBytes, config.programIdentifier, sha256(output));
         } else if (zkCoProcessor == ZkCoProcessorType.Succinct) {
             ISP1Verifier(config.zkVerifier).verifyProof(config.programIdentifier, output, proofBytes);
+        } else if (zkCoProcessor == ZkCoProcessorType.Pico) {
+            IPicoVerifier(config.zkVerifier)
+                .verifyPicoProof(config.programIdentifier, output, abi.decode(proofBytes, (uint256[8])));
         } else {
             revert InvalidZkCoProcessorType();
         }
