@@ -1,0 +1,24 @@
+# ============================================================
+#            SIGSTORE ATTESTATION VERIFIER
+#            MULTI-CHAIN DEPLOYMENT CONFIG
+# ============================================================
+
+# ========== PER-CHAIN CONFIGURATION ==========
+# Each chain section contains:
+#   - endpoint_url: RPC endpoint (use env vars for security)
+#   - [chain.address]: owner and verifier contract addresses
+#   - [chain.bool]: flags to enable/disable each ZK verifier
+
+# ---------------------- ATA SEPOLIA ----------------------
+[1398243]
+endpoint_url = "${ATA_SEPOLIA_RPC_URL}"
+
+[1398243.address]
+owner = "${OWNER}"
+risc_zero_verifier = "0xaE7F7EC735b6A90366e55f87780b36e7e6Ec3c65"
+sp1_verifier = "0x7291752B7c1e0E69adF9801865b25435b0bE4Fc6"
+
+[1398243.bool]
+enable_risc_zero = true
+enable_sp1 = true
+enable_pico = false
