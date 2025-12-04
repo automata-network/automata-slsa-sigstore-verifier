@@ -10,7 +10,8 @@ import {ZkCoProcessorType} from "../src/interfaces/ISigstoreAttestationVerifier.
 
 /// @title ConfigScript
 /// @notice Script for updating ZK co-processor configuration on deployed SigstoreAttestationVerifier
-/// @dev Reads verifier addresses from deployment.toml, program IDs from environment variables
+/// @dev Reads verifier addresses from deployment.toml, contract address from deployments/{chainId}.json,
+///      and program IDs from environment variables
 ///
 /// Usage:
 ///   RiscZero:  forge script script/Config.s.sol --sig "configureRiscZero()" --rpc-url $RPC_URL --broadcast
@@ -18,16 +19,28 @@ import {ZkCoProcessorType} from "../src/interfaces/ISigstoreAttestationVerifier.
 ///   Pico:      forge script script/Config.s.sol --sig "configurePico()" --rpc-url $RPC_URL --broadcast
 ///
 /// Required env vars:
-///   SIGSTORE_VERIFIER  - Address of deployed SigstoreAttestationVerifier
 ///   RISC_ZERO_IMAGE_ID - RiscZero program image ID (for configureRiscZero)
 ///   SP1_VKEY           - SP1 verification key (for configureSp1)
 ///   PICO_VKEY          - Pico verification key (for configurePico)
 contract ConfigScript is Script, Config {
     string internal constant CONFIG_PATH = "./script/config/deployment.toml";
+    string internal constant DEPLOYMENTS_PATH = "./deployments/";
+
+    error DeploymentNotFound(uint256 chainId);
 
     error ZkCoProcessorNotEnabled(string name);
     error MissingProgramId(string name);
     error MissingVerifierAddress();
+
+    /// @notice Get the deployed contract address from deployments/{chainId}.json
+    function _getDeployedContract(uint256 chainId) internal view returns (address) {
+        string memory path = string.concat(DEPLOYMENTS_PATH, vm.toString(chainId), ".json");
+        if (!vm.exists(path)) {
+            revert DeploymentNotFound(chainId);
+        }
+        string memory json = vm.readFile(path);
+        return vm.parseJsonAddress(json, ".SigstoreAttestationVerifier");
+    }
 
     /// @notice Configure RiscZero on the deployed contract
     function configureRiscZero() external {
@@ -52,8 +65,8 @@ contract ConfigScript is Script, Config {
             revert MissingVerifierAddress();
         }
 
-        // Read deployed contract address from env
-        address contractAddr = vm.envAddress("SIGSTORE_VERIFIER");
+        // Read deployed contract address from deployment file
+        address contractAddr = _getDeployedContract(chainId);
 
         console2.log("Configuring RiscZero on chain", chainId);
         console2.log("  Contract:", contractAddr);
@@ -93,8 +106,8 @@ contract ConfigScript is Script, Config {
             revert MissingVerifierAddress();
         }
 
-        // Read deployed contract address from env
-        address contractAddr = vm.envAddress("SIGSTORE_VERIFIER");
+        // Read deployed contract address from deployment file
+        address contractAddr = _getDeployedContract(chainId);
 
         console2.log("Configuring SP1 on chain", chainId);
         console2.log("  Contract:", contractAddr);
@@ -134,8 +147,8 @@ contract ConfigScript is Script, Config {
             revert MissingVerifierAddress();
         }
 
-        // Read deployed contract address from env
-        address contractAddr = vm.envAddress("SIGSTORE_VERIFIER");
+        // Read deployed contract address from deployment file
+        address contractAddr = _getDeployedContract(chainId);
 
         console2.log("Configuring Pico on chain", chainId);
         console2.log("  Contract:", contractAddr);
@@ -156,7 +169,7 @@ contract ConfigScript is Script, Config {
     function configureAll() external {
         _loadConfig(CONFIG_PATH, false);
         uint256 chainId = block.chainid;
-        address contractAddr = vm.envAddress("SIGSTORE_VERIFIER");
+        address contractAddr = _getDeployedContract(chainId);
 
         console2.log("Configuring all enabled ZK co-processors on chain", chainId);
         console2.log("  Contract:", contractAddr);

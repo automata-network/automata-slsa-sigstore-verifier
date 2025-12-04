@@ -17,8 +17,9 @@ endpoint_url = "${ATA_SEPOLIA_RPC_URL}"
 owner = "${OWNER}"
 risc_zero_verifier = "0xaE7F7EC735b6A90366e55f87780b36e7e6Ec3c65"
 sp1_verifier = "0x7291752B7c1e0E69adF9801865b25435b0bE4Fc6"
+pico_verifier = "0x961B849FEc59c355868F4ac0490c16F112DFA4F3"
 
 [1398243.bool]
 enable_risc_zero = true
 enable_sp1 = true
-enable_pico = false
+enable_pico = true
