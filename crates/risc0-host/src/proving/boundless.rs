@@ -148,8 +148,10 @@ pub async fn prove_with_boundless(
         }
 
         if let Some(timeout) = config.timeout {
-            println!("⏱️  Timeout: {} seconds", timeout);
-            offer_builder.timeout(timeout);
+            println!("⏱️  Lock Timeout: {} seconds", timeout);
+            println!("⏱️  Order Expiration Timeout: {} seconds", timeout + 600);
+            offer_builder.lock_timeout(timeout);
+            offer_builder.timeout(timeout + 600);
         }
 
         if let Some(ramp_up_period) = config.ramp_up_period {
