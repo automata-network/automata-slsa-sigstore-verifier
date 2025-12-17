@@ -29,7 +29,7 @@ const Hero: React.FC = () => {
           Trust your <br />
           software. <br />
           <span className="bg-gradient-to-r from-orange-400 to-amber-600 bg-clip-text text-transparent">
-            Prove it on-chain.
+            Prove it onchain.
           </span>
         </h1>
 
